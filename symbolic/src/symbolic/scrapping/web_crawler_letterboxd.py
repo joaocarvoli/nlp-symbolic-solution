@@ -124,3 +124,6 @@ if __name__ == "__main__":
     get_all_reviews(movie_url, output_file)
     
     print(f"\n✅ Coleta finalizada! Arquivo salvo: {output_file}")
+
+
+# Website example: https://letterboxd.com/film/julie-keeps-quiet/reviews/
