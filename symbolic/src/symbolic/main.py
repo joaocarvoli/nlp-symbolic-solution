@@ -9,7 +9,7 @@ from utils.evaluation import results
 if __name__ == '__main__':
     # Reading
     symbols, words = dic_reader()
-    movies = pd.read_csv('./data/movie_reviews_with_language.csv')
+    movies = pd.read_csv('/Users/jv/Desktop/uni/nlp-symbolic-solution/symbolic/data/movie_reviews_with_language.csv')
 
     # Processing
     
