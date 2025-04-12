@@ -173,4 +173,4 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-./symbolic/data/LIWC2015_pt2-sem-pulo-linhas.dic
+./data/LIWC2015_pt2-sem-pulo-linhas.dic

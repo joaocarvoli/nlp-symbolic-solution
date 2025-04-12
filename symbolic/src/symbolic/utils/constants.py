@@ -6,3 +6,18 @@ stop_words = {'o', 'a', 'os', 'as', 'um', 'uma', 'uns', 'umas', 'de', 'do', 'da'
 punctuation = set(string.punctuation)
 PREPROCESSING_COLUMN = 'cleaned_comment'
 SENTIMENT_COLUMN = 'sentiment'
+DEFAULT_MOVIE = 'Shrek 2'
+SENTIMENT_IMAGES = {
+    'Neutral': {
+        'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214',
+        'label': 'Opiniões divergentes'
+    },
+    'Positive': {
+        'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Smiling_Face_Emoji.png?9898922749706957214',
+        'label': 'Recomendado'
+    },
+    'Negative': {
+        'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sad_Face_Emoji.png?9898922749706957214',
+        'label': 'Não recomendado'
+    }
+}

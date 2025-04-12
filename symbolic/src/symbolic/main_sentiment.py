@@ -1,10 +1,10 @@
 import pandas as pd
 
-from utils.reader import dic_reader
-from utils.preprocessing import comment_preprocessing
+from symbolic.src.symbolic.sentiment.reader import dic_reader
+from symbolic.src.symbolic.sentiment.preprocessing import comment_preprocessing
 from utils.constants import PREPROCESSING_COLUMN, SENTIMENT_COLUMN
-from utils.sentiment import dataframe_sentiment
-from utils.evaluation import results
+from symbolic.src.symbolic.sentiment.sentiment import dataframe_sentiment
+from symbolic.src.symbolic.sentiment.evaluation import results
     
 if __name__ == '__main__':
     # Reading
