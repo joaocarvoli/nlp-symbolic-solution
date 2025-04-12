@@ -1,7 +1,7 @@
 import re
 from typing import Tuple, List, Dict
 
-from symbolic.types.dictionary import Category, DictionaryEntry
+from symbolic.typesd.dictionary import Category, DictionaryEntry
 
 
 def read_dic_file(filepath: str) -> Tuple[Dict[int, Category], List[DictionaryEntry]]:

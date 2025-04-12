@@ -2,7 +2,7 @@
 def dic_reader():
     symbols = dict()
     words = dict()
-    with open('/Users/jv/Desktop/uni/nlp-symbolic-solution/symbolic/dictionary/LIWC2015_pt2-sem-pulo-linhas.dic', 'r', encoding="utf-8") as file:
+    with open('../../data/LIWC2015_pt2-sem-pulo-linhas.dic', 'r', encoding="utf-8") as file:
         symbol_read = False
         for line in file:
             line = line.strip()
