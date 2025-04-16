@@ -11,7 +11,7 @@ def word_cleaning(word: str):
 def comment_preprocessing(df: pd.DataFrame, preprocessing_col: str):
     df[preprocessing_col] = df['comment'].apply(lambda x: [
         word_cleaning(word).lower() for word in x.split() 
-        if (word not in punctuation)
+        #if (word not in punctuation)
     ])
 
     return df
