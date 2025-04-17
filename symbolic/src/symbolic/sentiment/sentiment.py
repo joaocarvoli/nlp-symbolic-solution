@@ -26,8 +26,8 @@ def analyze_sentiment(df: pd.DataFrame, sentiment_col: str):
     negative = sentiment_counts.get(-1, 0)
 
     if positive > negative:
-        return 'Positive'
+        return 1
     elif negative > positive:
-        return 'Negative'
+        return -1
     else:
-        return 'Neutral'
+        return 0

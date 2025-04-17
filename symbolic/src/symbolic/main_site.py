@@ -16,7 +16,7 @@ if __name__ == '__main__':
 Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
 
     movie = st.text_input('Nome do filme', value=DEFAULT_MOVIE)
-    poster_url, comments = get_movie_reviews(movie)
+    poster_url, rating, comments = get_movie_reviews(movie)
 
     comments = pd.DataFrame(comments)
     movies_pt = comment_preprocessing(comments, PREPROCESSING_COLUMN)

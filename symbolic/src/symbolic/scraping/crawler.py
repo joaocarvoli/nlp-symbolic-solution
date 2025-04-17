@@ -101,10 +101,11 @@ def get_movie_url(movie_name: str):
     result = requests.get(f'https://api.letterboxd.com/api/v0/search', params={'input': movie_name}).json()
     film_url = result['items'][0]['film']['links'][0]['url']
     poster_url = result['items'][0]['film']['poster']['sizes'][1]['url']
-    return film_url, poster_url
+    rating = round(result['items'][0]['film']['rating'], 1)
+    return film_url, poster_url, rating
 
 def get_movie_reviews(movie_name: str):
-    movie_url, poster_url = get_movie_url(movie_name)
+    movie_url, poster_url, rating = get_movie_url(movie_name)
     movie_reviews_url = f'{movie_url}reviews/'
 
     url_gen = url_generator(movie_reviews_url)
@@ -125,4 +126,4 @@ def get_movie_reviews(movie_name: str):
         for f in futures:
             f.result()
 
-    return poster_url, shared_data['all_comments']
+    return poster_url, rating, shared_data['all_comments']

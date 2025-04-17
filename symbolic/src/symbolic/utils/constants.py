@@ -8,15 +8,15 @@ PREPROCESSING_COLUMN = 'cleaned_comment'
 SENTIMENT_COLUMN = 'sentiment'
 DEFAULT_MOVIE = 'Shrek 2'
 SENTIMENT_IMAGES = {
-    'Neutral': {
+    0: {
         'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214',
         'label': 'Opiniões divergentes'
     },
-    'Positive': {
+    1: {
         'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Smiling_Face_Emoji.png?9898922749706957214',
         'label': 'Recomendado'
     },
-    'Negative': {
+    -1: {
         'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Sad_Face_Emoji.png?9898922749706957214',
         'label': 'Não recomendado'
     }
