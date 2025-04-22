@@ -7,6 +7,7 @@ punctuation = set(string.punctuation)
 PREPROCESSING_COLUMN = 'cleaned_comment'
 SENTIMENT_COLUMN = 'sentiment'
 DEFAULT_MOVIE = 'Shrek 2'
+ERROR_IMAGE = 'https://cdn-icons-png.flaticon.com/512/10809/10809585.png'
 SENTIMENT_IMAGES = {
     0: {
         'image': 'https://cdn.shopify.com/s/files/1/1061/1924/files/Neutral_Face_Emoji.png?9898922749706957214',
