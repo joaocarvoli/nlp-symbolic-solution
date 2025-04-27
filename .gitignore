@@ -175,4 +175,4 @@ cython_debug/
 
 symbolic/data/LIWC2015_pt2-sem-pulo-linhas.dic
 symbolic/data/movies/
-symbolic/wrong_movies.txt
+symbolic/data/wrong_movies.txt
