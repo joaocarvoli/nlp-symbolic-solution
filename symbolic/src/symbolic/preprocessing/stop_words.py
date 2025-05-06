@@ -1,5 +1,8 @@
 from typing import Set
+import nltk
 from nltk.corpus import stopwords
+
+nltk.download('stopwords')
 
 def get_stopwords(include_negations: bool = False) -> Set[str]:
     nltk_stops = set(stopwords.words('portuguese'))
@@ -11,7 +14,7 @@ def get_stopwords(include_negations: bool = False) -> Set[str]:
     }
     
     all_stopwords = nltk_stops | manual_stops
-    
+
     if not include_negations:
         negations = {'não', 'nunca', 'jamais', 'nem', 'sem'}
         for word in negations:

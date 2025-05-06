@@ -12,6 +12,7 @@ from utils.constants import PREPROCESSING_COLUMN, SENTIMENT_COLUMN
 with open('./data/movies.txt', encoding='utf-8') as f:
     dict_loader = DictionaryLoader()
     categories_df, entries_df = dict_loader.load()
+    os.makedirs('./data/movies', exist_ok=True)
 
     for movie_name in f.readlines():
         movie_name = movie_name.strip()
@@ -29,7 +30,6 @@ with open('./data/movies.txt', encoding='utf-8') as f:
             movie_title = movies_pt.iloc[0]['movie_title'].lower()
             movie_title = re.sub(r'[^\w\s]', '', movie_title)
             movie_title = movie_title.replace(' ', '_')
-            print(movie_title, '\n')
 
             movies_pt.to_csv(f'./data/movies/{movie_title}.csv', index=False)
             
