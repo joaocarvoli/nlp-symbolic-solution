@@ -1,7 +1,7 @@
 from typing import List
 from nltk.stem import PorterStemmer
 from pandas import DataFrame
-from helpers.similarity import similar
+from symbolic.src.helpers.similarity import similar
 
 
 def _query_by_similarity(entry_df: DataFrame, word: str) -> List[int]:

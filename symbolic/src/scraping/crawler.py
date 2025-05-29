@@ -51,7 +51,7 @@ def worker(url_gen, shared_data, lock):
         else:
             movie_title = "N/A"
 
-        review_elements = soup.find_all('li', class_='film-detail')
+        review_elements = soup.find_all('article', class_='production-record')
         if not review_elements:
             break
 
@@ -106,7 +106,7 @@ def get_movie_url(movie_name: str):
 
 def get_movie_reviews(movie_name: str):
     movie_url, poster_url, rating = get_movie_url(movie_name)
-    movie_reviews_url = f'{movie_url}reviews/'
+    movie_reviews_url = f'{movie_url}reviews/by/activity/'
 
     url_gen = url_generator(movie_reviews_url)
     num_workers=10

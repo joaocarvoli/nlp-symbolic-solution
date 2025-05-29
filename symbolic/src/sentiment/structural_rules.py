@@ -1,6 +1,6 @@
 from typing import List, Set
 import pandas as pd
-from custom_types.strategy import WordStrategy, WORD_STRATEGY
+from symbolic.src.custom_types.strategy import WordStrategy, WORD_STRATEGY
 
 def apply_clause_rule(tokens: List[str], conjunctions: Set[str], entries_df: pd.DataFrame, strategy: WordStrategy = WordStrategy.STEM) -> float:
     clauses = []

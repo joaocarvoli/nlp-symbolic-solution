@@ -1,8 +1,8 @@
 from typing import List
 import pandas as pd
 
-from preprocessing.stop_words import get_stopwords
-from preprocessing.tokenize_text import clean_token, tokenize_text
+from symbolic.src.preprocessing.stop_words import get_stopwords
+from symbolic.src.preprocessing.tokenize_text import clean_token, tokenize_text
 
 def preprocess_text(text: str, remove_stopwords: bool = True) -> List[str]:
     """
