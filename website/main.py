@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import torch
 from symbolic.src.scraping.crawler import get_movie_reviews
 from symbolic.src.sentiment.sentiment import analyze_sentiment
 from symbolic.src.sentiment.analyzer import SentimentAnalyzer
@@ -7,6 +8,7 @@ from symbolic.src.preprocessing.cleaner import preprocess_dataframe
 from symbolic.src.utils.dictionary import DictionaryLoader
 from symbolic.src.utils.constants import ERROR_IMAGE, PREPROCESSING_COLUMN, SENTIMENT_COLUMN, SENTIMENT_IMAGES, DEFAULT_MOVIE
 from symbolic.src.sentiment.visualization import get_sentiment_pie
+from neural.model import tokenizer, model
 
 def display_error(e: Exception):
     print(e)
@@ -18,6 +20,21 @@ def display_error(e: Exception):
         st.subheader('''Tivemos um problema ao buscar este filme no Letterboxd. 
 
 Tente novamente ou experimente outro título.''') 
+
+def post_processing(movies_pt):
+    sentiment = analyze_sentiment(movies_pt, SENTIMENT_COLUMN)
+    pie = get_sentiment_pie(movies_pt)
+    movie_title = movies_pt.iloc[0]['movie_title']
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.header(movie_title)
+        st.image(poster_url)
+    with col2:
+        st.subheader(SENTIMENT_IMAGES[sentiment]['label'])
+        st.image(SENTIMENT_IMAGES[sentiment]['image'])
+        st.plotly_chart(pie)
+
 
 if __name__ == '__main__':
     dict_loader = DictionaryLoader()
@@ -32,29 +49,42 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
     on = st.toggle("AI Mode")
     try:
         poster_url, rating, comments = get_movie_reviews(movie)
+        movies_pt = pd.DataFrame(comments)
     except Exception as e:
         display_error()
     
     if on:
-        st.write('AI!!!')
+        try:
+            inputs = tokenizer(
+                movies_pt['comment'].tolist(), 
+                truncation=True, 
+                padding='max_length', 
+                max_length=256, 
+                return_tensors='pt'
+            )
+
+            # Colocar o modelo em modo de avaliação
+            model.eval()
+
+            # Desativar o cálculo de gradiente
+            with torch.no_grad():
+                outputs = model(**inputs)
+                logits = outputs.logits
+                probs = torch.softmax(logits, dim=-1)
+                preds = torch.argmax(probs, dim=-1)
+
+            movies_pt[SENTIMENT_COLUMN] = preds.cpu().numpy()
+            print(movies_pt[SENTIMENT_COLUMN].head())
+            post_processing(movies_pt)
+        except Exception as e:
+            display_error()
+
     else:
         try:
-            movies_pt = pd.DataFrame(comments)
             movies_pt = preprocess_dataframe(movies_pt, 'comment', PREPROCESSING_COLUMN)
             analyzer = SentimentAnalyzer(entries_df)
             movies_pt = analyzer.analyze_dataframe(movies_pt, PREPROCESSING_COLUMN, SENTIMENT_COLUMN)
-            sentiment = analyze_sentiment(movies_pt, SENTIMENT_COLUMN)
-            pie = get_sentiment_pie(movies_pt)
-            movie_title = movies_pt.iloc[0]['movie_title']
-
-            col1, col2 = st.columns(2)
-            with col1:
-                st.header(movie_title)
-                st.image(poster_url)
-            with col2:
-                st.subheader(SENTIMENT_IMAGES[sentiment]['label'])
-                st.image(SENTIMENT_IMAGES[sentiment]['image'])
-                st.plotly_chart(pie)
+            post_processing(movies_pt)
 
         except Exception as e:
             display_error()
