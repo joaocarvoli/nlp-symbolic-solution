@@ -1,6 +1,8 @@
+import torch
+torch.classes = None
+
 import streamlit as st
 import pandas as pd
-import torch
 from symbolic.src.scraping.crawler import get_movie_reviews
 from symbolic.src.sentiment.sentiment import analyze_sentiment
 from symbolic.src.sentiment.analyzer import SentimentAnalyzer
@@ -46,7 +48,7 @@ if __name__ == '__main__':
 Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
 
     movie = st.text_input('Nome do filme', value=DEFAULT_MOVIE)
-    on = st.toggle("AI Mode")
+    on = st.toggle("Modo IA")
     try:
         poster_url, rating, comments = get_movie_reviews(movie)
         movies_pt = pd.DataFrame(comments)
@@ -63,18 +65,17 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
                 return_tensors='pt'
             )
 
-            # Colocar o modelo em modo de avaliação
             model.eval()
 
-            # Desativar o cálculo de gradiente
             with torch.no_grad():
-                outputs = model(**inputs)
-                logits = outputs.logits
-                probs = torch.softmax(logits, dim=-1)
-                preds = torch.argmax(probs, dim=-1)
-
-            movies_pt[SENTIMENT_COLUMN] = preds.cpu().numpy()
-            print(movies_pt[SENTIMENT_COLUMN].head())
+                outputs = model(inputs)
+                logits = outputs.logits.squeeze(-1)
+                probs = torch.sigmoid(logits)
+                preds = (probs > 0.5).int()
+            
+            results = preds.cpu().numpy()
+            movies_pt[SENTIMENT_COLUMN] = results
+            movies_pt[SENTIMENT_COLUMN] = movies_pt[SENTIMENT_COLUMN].replace(0, -1)
             post_processing(movies_pt)
         except Exception as e:
             display_error()
