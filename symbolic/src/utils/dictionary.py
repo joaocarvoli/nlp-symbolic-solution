@@ -1,6 +1,6 @@
 import os
 import pandas as pd
-from helpers.read_dict import read_dic_file
+from symbolic.src.helpers.read_dict import read_dic_file
 
 class DictionaryLoader:
 
@@ -10,12 +10,12 @@ class DictionaryLoader:
                 src_dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 symbolic_base_dir_path = os.path.dirname(src_dir_path)
                 project_symbolic_dir_path = os.path.dirname(symbolic_base_dir_path)
-
+                print(project_symbolic_dir_path)
                 default_path = os.path.join(project_symbolic_dir_path, 'data', 'LIWC2015_pt2-sem-pulo-linhas.dic')
 
             except NameError:
                  base_path = os.getcwd()
-                 default_path = os.path.join(base_path, 'symbolic', 'data', 'LIWC2015_pt2-sem-pulo-linhas.dic')
+                 default_path = os.path.join(base_path, 'data', 'LIWC2015_pt2-sem-pulo-linhas.dic')
                  print(default_path)
 
             file_path = default_path

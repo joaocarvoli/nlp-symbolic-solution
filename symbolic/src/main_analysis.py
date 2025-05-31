@@ -10,7 +10,7 @@ from utils.dictionary import DictionaryLoader
 if __name__ == '__main__':
     dict_loader = DictionaryLoader()
     categories_df, entries_df = dict_loader.load()
-    movie_path = './data/all_comments.csv'
+    movie_path = '../../data/all_comments.csv'
     movies = pd.read_csv(movie_path)
     overall, positive, negative = evaluate_sentiment_results(movies, SENTIMENT_COLUMN)
 

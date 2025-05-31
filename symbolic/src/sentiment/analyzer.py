@@ -2,10 +2,10 @@ import functools
 import pandas as pd
 from typing import List
 
-from sentiment.word_level import get_word_categories, is_quoted_phrase, word_sentiment, word_sentiment_with_stemming
-from sentiment.context_rules import apply_negation_rule, apply_intensifier_rule, apply_punctuation_rule
-from sentiment.structural_rules import apply_clause_rule, apply_comparison_rule
-from custom_types.strategy import register_word_sentiment_functions
+from symbolic.src.sentiment.word_level import get_word_categories, is_quoted_phrase, word_sentiment, word_sentiment_with_stemming
+from symbolic.src.sentiment.context_rules import apply_negation_rule, apply_intensifier_rule, apply_punctuation_rule
+from symbolic.src.sentiment.structural_rules import apply_clause_rule, apply_comparison_rule
+from symbolic.src.custom_types.strategy import register_word_sentiment_functions
 
 register_word_sentiment_functions(word_sentiment, word_sentiment_with_stemming)
 
