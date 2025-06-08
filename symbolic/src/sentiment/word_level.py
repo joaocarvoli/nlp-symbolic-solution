@@ -1,8 +1,8 @@
 from typing import List
 import pandas as pd
 from nltk.stem import PorterStemmer
-from custom_types.strategy import WordStrategy
-from preprocessing.stemming import _query_by_similarity
+from symbolic.src.custom_types.strategy import WordStrategy
+from symbolic.src.preprocessing.stemming import _query_by_similarity
 
 def get_word_categories(word: str, entries_df: pd.DataFrame, strategy: WordStrategy = WordStrategy.STEM) -> List[int]:
     exact_match = entries_df[entries_df['word'] == word]
