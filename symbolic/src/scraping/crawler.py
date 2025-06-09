@@ -102,7 +102,7 @@ def worker(url_gen, shared_data, lock):
 
 def get_movie_url(movie_name: str):
     result = requests.get(f'https://api.letterboxd.com/api/v0/search', params={'input': movie_name}).json()
-    if not result['items']:
+    if not result['items'] or 'film' not in result['items'][0]:
         raise ValueError("Filme não encontrado na busca do Letterboxd.")
     film_url = result['items'][0]['film']['links'][0]['url']
     poster_url = result['items'][0]['film']['poster']['sizes'][1]['url']

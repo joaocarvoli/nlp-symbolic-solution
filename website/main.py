@@ -37,7 +37,15 @@ def post_processing(movies_pt):
         st.image(SENTIMENT_IMAGES[sentiment]['image'])
         st.plotly_chart(pie)
 
-    # Adiciona expander para mostrar/ocultar comentários
+    category = st.selectbox(label='Selecione uma categoria:',
+                    options = ['Todos', 'Não recomendado', 'Neutro', 'Recomendado'])
+    
+    category_num = {
+        'Não recomendado': -1,
+        'Neutro': 0,
+        'Recomendado': 1
+    }
+    
     sentiment_map = {
         1: "😊 Positivo",
         -1: "😞 Negativo",
@@ -45,13 +53,18 @@ def post_processing(movies_pt):
     }
 
     with st.expander("Mostrar comentários"):
-        for idx, row in movies_pt.iterrows():
+        if category == 'Todos':
+            comments_to_show = movies_pt[movies_pt[SENTIMENT_COLUMN].notnull()]
+        else:
+            comments_to_show = movies_pt[movies_pt[SENTIMENT_COLUMN] == category_num[category]]
+        for idx, row in comments_to_show.head(20).iterrows():
             sentiment_label = sentiment_map.get(row[SENTIMENT_COLUMN], "N/A")
             st.markdown(
                 f"**{row['username']}** &nbsp;|&nbsp; ⭐ {row['numeric_rating']} &nbsp;|&nbsp; {sentiment_label}<br>"
                 f"{row['comment']}",
                 unsafe_allow_html=True
             )
+
 
 if __name__ == '__main__':
     dict_loader = DictionaryLoader()
@@ -63,15 +76,25 @@ if __name__ == '__main__':
 Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
 
     movie = st.text_input('Nome do filme', value=DEFAULT_MOVIE)
+    buscar = st.button('Buscar')
     on = st.toggle("Modo IA")
-    try:
-        poster_url, rating, comments = get_movie_reviews(movie)
-        movies_pt = pd.DataFrame(comments)
-        if 'comment' not in movies_pt.columns or movies_pt.empty:
-            raise ValueError("Não foi possível encontrar comentários em português para este filme.")
-    except Exception as e:
-        display_error(e)
-    
+
+    if buscar or 'movies_pt' not in st.session_state or st.session_state.get('last_movie') != movie:
+        try:
+            poster_url, rating, comments = get_movie_reviews(movie)
+            movies_pt = pd.DataFrame(comments)
+            if 'comment' not in movies_pt.columns or movies_pt.empty:
+                raise ValueError("Não foi possível encontrar comentários em português para este filme.")
+            st.session_state['movies_pt'] = movies_pt
+            st.session_state['poster_url'] = poster_url
+            st.session_state['last_movie'] = movie
+        except Exception as e:
+            display_error(e)
+            st.stop()
+    else:
+        movies_pt = st.session_state['movies_pt']
+        poster_url = st.session_state['poster_url']
+
     if on:
         try:
             inputs = tokenizer(
@@ -85,10 +108,9 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
             model.eval()
 
             with torch.no_grad():
-                outputs = model(inputs)
-                logits = outputs.logits.squeeze(-1)
-                probs = torch.sigmoid(logits)
-                preds = (probs > 0.5).int()
+                outputs = model(**inputs)
+                logits = outputs.logits
+                preds = torch.argmax(logits, dim=1)
             
             results = preds.cpu().numpy()
             movies_pt[SENTIMENT_COLUMN] = results
@@ -96,6 +118,7 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
             post_processing(movies_pt)
         except Exception as e:
             display_error(e)
+            st.stop()
 
     else:
         try:
@@ -106,3 +129,4 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
 
         except Exception as e:
             display_error(e)
+            st.stop()
