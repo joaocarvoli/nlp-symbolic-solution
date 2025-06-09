@@ -20,8 +20,8 @@ def display_error(e: Exception):
         st.image(ERROR_IMAGE)
     with col2:
         st.subheader('''Tivemos um problema ao buscar este filme no Letterboxd. 
-
-Tente novamente ou experimente outro título.''') 
+Tente novamente ou experimente outro título.''')
+        st.write(f"Detalhe do erro: {e}") 
 
 def post_processing(movies_pt):
     sentiment = analyze_sentiment(movies_pt, SENTIMENT_COLUMN)
@@ -37,6 +37,21 @@ def post_processing(movies_pt):
         st.image(SENTIMENT_IMAGES[sentiment]['image'])
         st.plotly_chart(pie)
 
+    # Adiciona expander para mostrar/ocultar comentários
+    sentiment_map = {
+        1: "😊 Positivo",
+        -1: "😞 Negativo",
+        0: "😐 Neutro"
+    }
+
+    with st.expander("Mostrar comentários"):
+        for idx, row in movies_pt.iterrows():
+            sentiment_label = sentiment_map.get(row[SENTIMENT_COLUMN], "N/A")
+            st.markdown(
+                f"**{row['username']}** &nbsp;|&nbsp; ⭐ {row['numeric_rating']} &nbsp;|&nbsp; {sentiment_label}<br>"
+                f"{row['comment']}",
+                unsafe_allow_html=True
+            )
 
 if __name__ == '__main__':
     dict_loader = DictionaryLoader()
@@ -52,8 +67,10 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
     try:
         poster_url, rating, comments = get_movie_reviews(movie)
         movies_pt = pd.DataFrame(comments)
+        if 'comment' not in movies_pt.columns or movies_pt.empty:
+            raise ValueError("Não foi possível encontrar comentários em português para este filme.")
     except Exception as e:
-        display_error()
+        display_error(e)
     
     if on:
         try:
@@ -78,7 +95,7 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
             movies_pt[SENTIMENT_COLUMN] = movies_pt[SENTIMENT_COLUMN].replace(0, -1)
             post_processing(movies_pt)
         except Exception as e:
-            display_error()
+            display_error(e)
 
     else:
         try:
@@ -88,4 +105,4 @@ Ele informa se o sentimento geral inclina para o positivo ou negativo.''')
             post_processing(movies_pt)
 
         except Exception as e:
-            display_error()
+            display_error(e)

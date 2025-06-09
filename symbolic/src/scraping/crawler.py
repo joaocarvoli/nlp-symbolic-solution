@@ -4,6 +4,7 @@ from urllib.parse import urljoin
 from langdetect import detect, LangDetectException
 from concurrent.futures import ThreadPoolExecutor
 import threading
+import pandas as pd
 
 RATING_MAP = {
     'rated-1': 0.5,
@@ -51,7 +52,7 @@ def worker(url_gen, shared_data, lock):
         else:
             movie_title = "N/A"
 
-        review_elements = soup.find_all('article', class_='production-record')
+        review_elements = soup.find_all('article', class_='production-viewing')
         if not review_elements:
             break
 
@@ -70,6 +71,8 @@ def worker(url_gen, shared_data, lock):
                         likes_element and 'data-count' in likes_element.attrs) else 0
 
                 comment_tag = review.find('div', class_='js-review-body')
+                if not comment_tag:
+                    comment_tag = review.find('div', class_='body-text -prose -reset js-review-body js-collapsible-text')
                 comment = comment_tag.get_text(strip=True, separator=' ') if comment_tag else "N/A"
 
                 try:
@@ -77,15 +80,15 @@ def worker(url_gen, shared_data, lock):
                 except LangDetectException:
                     language = "unknown"
 
-                if language == 'pt':
-                    comments.append({
-                        'movie_title': movie_title,
-                        'username': username,
-                        'numeric_rating': numeric_rating,
-                        'likes': likes,
-                        'language': language,
-                        'comment': comment
-                    })
+                # Adiciona todos os comentários, independentemente do idioma
+                comments.append({
+                    'movie_title': movie_title,
+                    'username': username,
+                    'numeric_rating': numeric_rating,
+                    'likes': likes,
+                    'language': language,
+                    'comment': comment
+                })
 
             except Exception as e:
                 print(f"Erro no comentário: {e}")
@@ -99,6 +102,8 @@ def worker(url_gen, shared_data, lock):
 
 def get_movie_url(movie_name: str):
     result = requests.get(f'https://api.letterboxd.com/api/v0/search', params={'input': movie_name}).json()
+    if not result['items']:
+        raise ValueError("Filme não encontrado na busca do Letterboxd.")
     film_url = result['items'][0]['film']['links'][0]['url']
     poster_url = result['items'][0]['film']['poster']['sizes'][1]['url']
     rating = round(result['items'][0]['film']['rating'], 1)
@@ -107,6 +112,7 @@ def get_movie_url(movie_name: str):
 def get_movie_reviews(movie_name: str):
     movie_url, poster_url, rating = get_movie_url(movie_name)
     movie_reviews_url = f'{movie_url}reviews/by/activity/'
+    print(movie_reviews_url)
 
     url_gen = url_generator(movie_reviews_url)
     num_workers=10
@@ -126,4 +132,22 @@ def get_movie_reviews(movie_name: str):
         for f in futures:
             f.result()
 
-    return poster_url, rating, shared_data['all_comments']
+    comments = shared_data['all_comments']
+    
+    if not shared_data['all_comments']:
+        raise ValueError("Nenhum comentário foi coletado. O scraping pode ter falhado ou o seletor está incorreto.")
+    
+    movies_pt = pd.DataFrame(comments)
+
+    # Primeiro tenta em português
+    df_pt = movies_pt[movies_pt['language'] == 'pt']
+
+    if not df_pt.empty and 'comment' in df_pt.columns:
+        movies_to_use = df_pt
+    elif 'comment' in movies_pt.columns and not movies_pt.empty:
+        # Se não houver em português, usa qualquer idioma disponível
+        movies_to_use = movies_pt
+    else:
+        raise ValueError("Não foi possível encontrar comentários para este filme em nenhum idioma.")
+
+    return poster_url, rating, movies_to_use
