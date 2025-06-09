@@ -42,18 +42,23 @@ if __name__ == '__main__':
         movies_test['review_text'].tolist(),
         truncation=True, 
         padding='max_length', 
-        max_length=512, 
+        max_length=256, 
         return_tensors='pt'
     )
 
     model.eval()
 
+    print('Inputs ready!')
+
     with torch.no_grad():
         outputs = model(**inputs)
         logits = outputs.logits
         preds = torch.argmax(logits, dim=1)
+
+    print("torch.no_grad finished")
     
     results = preds.cpu().numpy()
+    print("Results finished")
 
     movies_test[f'{SENTIMENT_COLUMN}_ia'] = results
     movies_test[f'{SENTIMENT_COLUMN}_ia'] = movies_test[f'{SENTIMENT_COLUMN}_ia'].replace(0, -1)
